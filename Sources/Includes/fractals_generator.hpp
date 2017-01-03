@@ -7,10 +7,6 @@
 
 #include "image.hpp"
 
-#include <complex>
-
-#include <future>
-
 namespace fractals
 {
 	auto find_mandelbrot(

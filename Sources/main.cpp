@@ -1,3 +1,8 @@
+/**
+ * Daniel Sebastian Iliescu, http://dansil.net
+ * MIT License (MIT), http://opensource.org/licenses/MIT
+ */
+
 #include "mandelbrot_generator.hpp"
 
 #include "netpbm_writer.hpp"
