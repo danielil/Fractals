@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/danielil/Fractals.svg?branch=master)](https://travis-ci.org/danielil/Fractals)
+[![Build Status](https://travis-ci.org/danielil/Fractals.svg?branch=master)](https://travis-ci.org/danielil/Fractals) [![Build status](https://ci.appveyor.com/api/projects/status/52l4k6pp40sju7a9?svg=true)](https://ci.appveyor.com/project/danielil/fractals)
 
 Fractals
 ================
@@ -19,4 +19,4 @@ C++14 conforming compiler.
 Limitations
 ------------------
 
-Slow performance with std::complex< double > on MSVC
+Extremely slow performance with std::abs( std::complex< double > ) on MSVC. Changing the standard function to manually compute the absolute value of a complex number (std::sqrt( real * real + imag * imag )) improves performance by a factor of nearly 40.

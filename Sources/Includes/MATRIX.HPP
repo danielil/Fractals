@@ -5,20 +5,20 @@
 
 #pragma once
 
-#include <vector>
+#include <memory>
 
 template < typename T >
 class matrix
 {
 public:
 	using value_type = T;
-	using container_type = std::vector< value_type >;
+	using container_type = std::unique_ptr< value_type[] >;
 	using index_type = std::size_t;
 
-	constexpr matrix(
+	matrix(
 		const index_type rows,
 		const index_type columns ) :
-		elements( rows * columns ),
+		container( std::make_unique< value_type[] >( rows * columns ) ),
 		rows( rows ),
 		columns( columns )
 	{
@@ -26,34 +26,42 @@ public:
 
 	~matrix() noexcept = default;
 
-	constexpr matrix( matrix const & other ) = default;
-	constexpr matrix( matrix&& other ) noexcept = default;
+	matrix( matrix const & other ) = default;
+	matrix( matrix&& other ) noexcept = default;
 
-	constexpr matrix& operator=( matrix const & rhs ) = default;
-	constexpr matrix& operator=( matrix&& rhs ) noexcept = default;
+	matrix& operator=( matrix const & rhs ) = default;
+	matrix& operator=( matrix&& rhs ) noexcept = default;
 
 	value_type*
 	operator[]( const index_type row )
 	{
 		auto offset = row * columns;
 
-		return this->elements.data() + offset;
+		return &this->container[offset];
 	}
 
-	constexpr index_type
+	value_type const * const
+	operator[]( const index_type row ) const
+	{
+		auto offset = row * columns;
+
+		return &this->container[offset];
+	}
+
+	index_type
 	get_rows() const
 	{
 		return this->rows;
 	}
 
-	constexpr index_type
+	index_type
 	get_columns() const
 	{
 		return this->columns;
 	}
 
 private:
-	container_type elements;
+	container_type container;
 
 	index_type rows;
 	index_type columns;

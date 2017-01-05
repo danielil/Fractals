@@ -33,6 +33,8 @@ int main()
 			min_complex,
 			max_complex );
 
+	auto image = fractals::retrieve_mandelbrot_image( buffer );
+
 	const auto end_calculation = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_calc = end_calculation - start;
 
@@ -42,7 +44,7 @@ int main()
 		filename,
 		netpbm::format::ppm,
 		netpbm::encoding::ascii,
-		buffer );
+		image );
 
 	const auto end_write = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_write = end_write - end_calculation;

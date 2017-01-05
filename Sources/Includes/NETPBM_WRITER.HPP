@@ -9,7 +9,6 @@
 
 #include <fstream>
 #include <unordered_map>
-#include <future>
 
 namespace netpbm
 {
@@ -74,12 +73,13 @@ namespace netpbm
 		output << static_cast< unsigned int >( std::numeric_limits< channel_depth >::max() ) << std::endl;
 	}
 
+	template < typename Image >
 	void
 	write(
 		const std::string filename,
 		const format format,
 		const encoding encoding,
-		image_rgb & buffer )
+		Image&& buffer )
 	{
 		std::ofstream output( filename + "." + format_to_string.at( format ) );
 		const auto magic_number = format_to_magic_number.at( format ).at( encoding );
