@@ -5,6 +5,10 @@ Fractals
 
 A program capable of generating various fractals. Currently, only the Mandelbrot set with the simple escape time algorithm is supported.
 
+Screenshot
+================
+![Output Screenshot](Resources/output_image.jpg)
+
 About
 ------------------
 
