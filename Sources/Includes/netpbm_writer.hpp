@@ -8,14 +8,18 @@
 #include "image.hpp"
 
 #include <fstream>
+#include <functional>
 #include <unordered_map>
 
 namespace netpbm
 {
 	enum class format
 	{
+		// Portable BitMap
 		pbm,
+		// Portable GrayMap
 		pgm,
+		// Portable PixMap
 		ppm
 	};
 
@@ -61,46 +65,104 @@ namespace netpbm
 		}
 	};
 
-	void
-	write_metadata(
-		std::ofstream & output,
-		const unsigned int magic_number,
-		const std::size_t rows,
-		const std::size_t columns )
-	{
-		output << "P" << magic_number << std::endl;
-		output << rows << " " << columns << std::endl;
-		output << static_cast< unsigned int >( std::numeric_limits< channel_depth >::max() ) << std::endl;
-	}
-
-	template < typename Image >
-	void
-	write(
+	std::ofstream
+	get_stream_writer(
 		const std::string filename,
 		const format format,
 		const encoding encoding,
-		Image&& buffer )
+		const std::size_t rows,
+		const std::size_t columns )
 	{
 		std::ofstream output( filename + "." + format_to_string.at( format ) );
 		const auto magic_number = format_to_magic_number.at( format ).at( encoding );
 
-		write_metadata(
-			output,
-			magic_number,
-			buffer.get_rows(),
-			buffer.get_columns() );
+		output << "P" << magic_number << std::endl;
+		output << rows << " " << columns << std::endl;
 
-		for ( std::size_t row = 0; row < buffer.get_rows(); ++row )
+		if ( format != format::pbm )
 		{
-			for ( std::size_t column = 0; column < buffer.get_columns(); ++column )
+			output << static_cast< unsigned int >( MAX_CHANNEL_VALUE ) << std::endl;
+		}
+
+		return output;
+	}
+
+	void
+	write(
+		const std::string filename,
+		const encoding encoding,
+		binary_image const & buffer )
+	{
+		auto writer =
+			get_stream_writer(
+				filename,
+				format::pbm,
+				encoding,
+				buffer.get_rows(),
+				buffer.get_columns() );
+
+		for ( binary_image::index_type row = 0; row < buffer.get_rows(); ++row )
+		{
+			for ( binary_image::index_type column = 0; column < buffer.get_columns(); ++column )
 			{
-				for ( std::size_t channel = 0; channel < RGB_CHANNELS; ++channel )
-				{
-					output << static_cast< unsigned int >( buffer[row][column][channel] ) << " ";
-				}
+				writer << static_cast< unsigned int >( buffer[row][column] ) << " ";
 			}
 
-			output << std::endl;
+			writer << std::endl;
+		}
+	}
+
+	void
+	write(
+		const std::string filename,
+		const encoding encoding,
+		monochrome_image const & image )
+	{
+		auto writer =
+			get_stream_writer(
+				filename,
+				format::pgm,
+				encoding,
+				image.get_rows(),
+				image.get_columns() );
+
+		for ( monochrome_image::index_type row = 0; row < image.get_rows(); ++row )
+		{
+			for ( monochrome_image::index_type column = 0; column < image.get_columns(); ++column )
+			{
+				writer << static_cast< unsigned int >( image[row][column] ) << " ";
+			}
+
+			writer << std::endl;
+		}
+	}
+
+	void
+	write(
+		const std::string filename,
+		const encoding encoding,
+		rgb_image const & image )
+	{
+		auto writer =
+			get_stream_writer(
+				filename,
+				format::ppm,
+				encoding,
+				image.get_rows(),
+				image.get_columns() );
+
+		for ( rgb_image::index_type row = 0; row < image.get_rows(); ++row )
+		{
+			for ( rgb_image::index_type column = 0; column < image.get_columns(); ++column )
+			{
+				const auto color = image[row][column];
+
+				writer << static_cast< unsigned int >( color.red ) << " ";
+				writer << static_cast< unsigned int >( color.green ) << " ";
+				writer << static_cast< unsigned int >( color.blue ) << " ";
+			}
+
+			writer << std::endl;
 		}
 	}
 }

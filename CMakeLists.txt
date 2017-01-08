@@ -7,7 +7,7 @@ project( Fractals CXX )
 
 # Create the executable given the source directory
 set( SOURCE_DIRECTORY Sources )
-set( EXECUTABLE_NAME ${PROJECT_NAME}${SOURCE_DIRECTORY} )
+set( EXECUTABLE_NAME ${PROJECT_NAME} )
 add_executable(
 	${EXECUTABLE_NAME}
 	${SOURCE_DIRECTORY}/main.cpp )

@@ -11,23 +11,29 @@
 #include <complex>
 #include <numeric>
 
-namespace fractals
+namespace fractals {
+namespace mandelbrot
 {
 	using real_type = double;
-	using mandelbrot_type = std::size_t;
 
-	auto
-	compute_mandelbrot_iteration(
+	using iteration_type = decltype( MAX_CHANNEL_VALUE );
+	using value_type = std::remove_const< iteration_type >::type;
+
+	using container_type = matrix< value_type >;
+	using index_type = container_type::index_type;
+
+	value_type
+	compute_iteration(
 		const real_type c_real,
 		const real_type c_imaginary,
-		const std::size_t max_iterations )
+		const value_type max_iterations )
 	{
 		const std::complex< real_type > c( c_real, c_imaginary );
 		std::complex< real_type > z = 0.0;
 
 		const auto bailout_coefficient = 2.0;
 
-		mandelbrot_type iteration;
+		value_type iteration;
 		for ( iteration = 0; ( iteration < max_iterations ) && ( std::abs( z ) < bailout_coefficient ); ++iteration )
 		{
 			z = z * z + c;
@@ -36,10 +42,10 @@ namespace fractals
 		return iteration;
 	}
 
-	auto
+	real_type
 	map_horizontal_pixel_to_real_value(
-		const std::size_t column,
-		const std::size_t columns,
+		const index_type column,
+		const index_type columns,
 		const real_type min_real,
 		const real_type max_real )
 	{
@@ -48,10 +54,10 @@ namespace fractals
 		return column * ( range / columns ) + min_real;
 	}
 
-	auto
+	real_type
 	map_vertical_pixel_to_imaginary_value(
-		const std::size_t row,
-		const std::size_t rows,
+		const index_type row,
+		const index_type rows,
 		const real_type min_imaginary,
 		const real_type max_imaginary )
 	{
@@ -60,67 +66,96 @@ namespace fractals
 		return row * ( range / rows ) + min_imaginary;
 	}
 
-	auto
-	compute_mandelbrot_buffer(
-		const std::size_t rows,
-		const std::size_t columns,
-		const std::size_t max_iterations,
+	value_type
+	compute_value(
+		const index_type row,
+		const index_type rows,
+		const index_type column,
+		const index_type columns,
+		const value_type max_iterations,
 		const real_type min_real,
 		const real_type max_real,
 		const real_type min_imaginary,
 		const real_type max_imaginary )
 	{
-		matrix< mandelbrot_type > set( rows, columns );
+		const auto imaginary_value =
+			map_vertical_pixel_to_imaginary_value(
+				row,
+				columns,
+				min_imaginary,
+				max_imaginary );
+
+		const auto real_value =
+			map_horizontal_pixel_to_real_value(
+				column,
+				rows,
+				min_real,
+				max_real );
+
+		return
+			compute_iteration(
+				real_value,
+				imaginary_value,
+				max_iterations );
+	}
+
+	container_type
+	compute_buffer(
+		const index_type rows,
+		const index_type columns,
+		const value_type max_iterations,
+		const real_type min_real,
+		const real_type max_real,
+		const real_type min_imaginary,
+		const real_type max_imaginary )
+	{
+		container_type set( rows, columns );
 
 		for ( std::size_t row = 0; row < set.get_rows(); ++row )
 		{
-			const auto imaginary_value =
-				map_vertical_pixel_to_imaginary_value(
-					row,
-					columns,
-					min_imaginary,
-					max_imaginary );
-
 			for ( std::size_t column = 0; column < set.get_columns(); ++column )
 			{
-				const auto real_value =
-					map_horizontal_pixel_to_real_value(
-						column,
+				set[row][column] =
+					compute_value(
+						row,
 						rows,
+						column,
+						columns,
+						max_iterations,
 						min_real,
-						max_real );
-
-				const auto iteration =
-					compute_mandelbrot_iteration(
-						real_value,
-						imaginary_value,
-						max_iterations );
-
-				set[row][column] = iteration;
+						max_real,
+						min_imaginary,
+						max_imaginary );
 			}
 		}
 
 		return set;
 	}
 
+	rgb_channels compute_color_map( const value_type value )
+	{
+		return
+		{
+			static_cast< channel_type >( value ), // Red
+			static_cast< channel_type >( value * value ), // Green
+			static_cast< channel_type >( value * std::abs( std::sin( value ) ) ) // Blue
+		};
+	}
+
 	template < typename Set >
 	auto
-	retrieve_mandelbrot_image( Set&& set )
+	retrieve_color_image( Set&& set )
 	{
-		image image( set.get_rows(), set.get_columns() );
+		rgb_image image( set.get_rows(), set.get_columns() );
 
 		for ( std::size_t row = 0; row < image.get_rows(); ++row )
 		{
 			for ( std::size_t column = 0; column < image.get_columns(); ++column )
 			{
-				const auto value = set[row][column];
-
-				image[row][column][RED] = static_cast< channel_depth >( value );
-				image[row][column][GREEN] = static_cast< channel_depth >( value * value );
-				image[row][column][BLUE] = static_cast< channel_depth >( value * std::abs( std::sin( value ) ) );
+				image[row][column] = compute_color_map( set[row][column] );
 			}
 		}
 
 		return image;
 	}
-}
+}}

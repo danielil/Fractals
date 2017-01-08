@@ -15,7 +15,7 @@ int main()
 	const std::string filename = "output_image";
 	const std::size_t rows = 1024;
 	const std::size_t columns = 1024;
-	const std::size_t max_iterations = std::numeric_limits< channel_depth >::max();
+	const auto max_iterations = MAX_CHANNEL_VALUE;
 	const double min_real = -1.5;
 	const double max_real = 0.7;
 	const double min_complex = -1.0;
@@ -23,17 +23,16 @@ int main()
 
 	const auto start = std::chrono::system_clock::now();
 
-	auto buffer =
-		fractals::compute_mandelbrot_buffer(
-			rows,
-			columns,
-			max_iterations,
-			min_real,
-			max_real,
-			min_complex,
-			max_complex );
-
-	auto image = fractals::retrieve_mandelbrot_image( buffer );
+	auto mandelbrot_color_image =
+		fractals::mandelbrot::retrieve_color_image(
+			fractals::mandelbrot::compute_buffer(
+				rows,
+				columns,
+				max_iterations,
+				min_real,
+				max_real,
+				min_complex,
+				max_complex ) );
 
 	const auto end_calculation = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_calc = end_calculation - start;
@@ -42,9 +41,8 @@ int main()
 
 	netpbm::write(
 		filename,
-		netpbm::format::ppm,
 		netpbm::encoding::ascii,
-		image );
+		mandelbrot_color_image );
 
 	const auto end_write = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_write = end_write - end_calculation;

@@ -16,11 +16,11 @@ public:
 	using index_type = std::size_t;
 
 	matrix(
-		const index_type rows,
-		const index_type columns ) :
-		container( std::make_unique< value_type[] >( rows * columns ) ),
-		rows( rows ),
-		columns( columns )
+		const index_type input_rows,
+		const index_type input_columns ) :
+		container( std::make_unique< value_type[] >( input_rows * input_columns ) ),
+		rows( input_rows ),
+		columns( input_columns )
 	{
 	}
 
@@ -60,7 +60,7 @@ public:
 		return this->columns;
 	}
 
-private:
+protected:
 	container_type container;
 
 	index_type rows;
