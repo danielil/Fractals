@@ -9,7 +9,7 @@
 
 #include <algorithm>
 #include <complex>
-#include <numeric>
+#include <type_traits>
 
 namespace fractals {
 namespace mandelbrot
@@ -100,7 +100,7 @@ namespace mandelbrot
 	}
 
 	container_type
-	compute_buffer(
+	compute_set(
 		const index_type rows,
 		const index_type columns,
 		const value_type max_iterations,
@@ -132,18 +132,53 @@ namespace mandelbrot
 		return set;
 	}
 
-	rgb_channels compute_color_map( const value_type value )
+	rgb_channels compute_color_from_set_value( const value_type value )
 	{
-		return
+		rgb_channels color;
+
+		color.red = static_cast< channel_type >( value ); // Red
+		color.green = static_cast< channel_type >( value * value ); // Green
+		color.blue = static_cast< channel_type >( value * std::abs( std::sin( value ) ) ); // Blue
+
+		return color;
+	}
+
+	rgb_image
+	compute_color_buffer(
+		const index_type rows,
+		const index_type columns,
+		const value_type max_iterations,
+		const real_type min_real,
+		const real_type max_real,
+		const real_type min_imaginary,
+		const real_type max_imaginary )
+	{
+		rgb_image image( rows, columns );
+
+		for ( std::size_t row = 0; row < image.get_rows(); ++row )
 		{
-			static_cast< channel_type >( value ), // Red
-			static_cast< channel_type >( value * value ), // Green
-			static_cast< channel_type >( value * std::abs( std::sin( value ) ) ) // Blue
-		};
+			for ( std::size_t column = 0; column < image.get_columns(); ++column )
+			{
+				image[row][column] =
+					compute_color_from_set_value(
+						compute_value(
+							row,
+							rows,
+							column,
+							columns,
+							max_iterations,
+							min_real,
+							max_real,
+							min_imaginary,
+							max_imaginary ) );
+			}
+		}
+
+		return image;
 	}
 
 	template < typename Set >
-	auto
+	rgb_image
 	retrieve_color_image( Set&& set )
 	{
 		rgb_image image( set.get_rows(), set.get_columns() );
@@ -152,7 +187,7 @@ namespace mandelbrot
 		{
 			for ( std::size_t column = 0; column < image.get_columns(); ++column )
 			{
-				image[row][column] = compute_color_map( set[row][column] );
+				image[row][column] = compute_color_from_set_value( set[row][column] );
 			}
 		}
 
