@@ -11,6 +11,8 @@
 #include <complex>
 #include <type_traits>
 
+#include <iostream>
+
 namespace fractals {
 namespace mandelbrot
 {

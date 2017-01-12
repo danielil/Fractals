@@ -6,9 +6,10 @@
 #pragma once
 
 #include <valarray>
+#include <array>
 
 template< typename T >
-class row_iterator
+class iterator
 {
 public:
 	using iterator_category = std::random_access_iterator_tag;
@@ -17,23 +18,23 @@ public:
 	using pointer = T*;
 	using reference = T&;
 
-	row_iterator(T const * const input_element) :
-		element(input_element)
+    iterator(
+		T* input_container,
+		std::slice input_slice ) :
+		container( input_container ),
+		slice( input_slice )
 	{
 	}
 
-	row_iterator(row_iterator const & it) :
-		element(it.element)
-	{
-	}
+    iterator(iterator const & it ) = default;
 
 	void
-	swap(row_iterator& it)
+	swap(iterator& it)
 	{
-		std::swap(this->element, it.element);
+		std::swap( this->container, it.container );
 	}
 
-	row_iterator&
+    iterator&
 	operator++()
 	{
 		++position;
@@ -41,16 +42,16 @@ public:
 		return *this;
 	}
 
-	row_iterator
-	operator++(int)
+    iterator
+	operator++( int )
 	{
-		const row_iterator iterator(*this);
-		++(*this);
+		const iterator iterator( *this );
+		++( *this );
 
 		return iterator;
 	}
 
-	row_iterator&
+    iterator&
 	operator--()
 	{
 		--position;
@@ -58,41 +59,47 @@ public:
 		return *this;
 	}
 
-	row_iterator
-	operator--(int)
+    iterator
+	operator--( int )
 	{
-		const row_iterator iterator(*this);
-		--(*this);
+		const iterator iterator( *this );
+		--( *this );
 
 		return iterator;
 	}
 
-	reference
+    reference
 	operator*() const
 	{
-		return this->node->item;
+		return this->ref( this->position );
+	}
+
+    reference
+	operator[]( std::size_t idx )
+	{
+		return this->ref( idx );
 	}
 
 	bool
-	operator==(row_iterator const & it) const
+	operator==(iterator const & it ) const
 	{
-		return ( *this == *it );
+		return ( this == *it );
 	}
 
 	bool
-	operator!=(row_iterator const & it) const
+	operator!=(iterator const & it ) const
 	{
-		return !(*this == it);
+		return !( *this == it );
 	}
 
 private:
 
-	reference ref( std::size_t idx) const
+    reference ref( std::size_t idx )
 	{
-		return element[slice.start() + idx * slice.stride()];
+		return (*this->container)[this->slice.start() + idx * this->slice.stride()];
 	}
 
-	std::valarray< T >* element = nullptr;
+	T* container;
 	std::slice slice;
 	std::size_t position = 0;
 };
@@ -122,20 +129,16 @@ public:
 	matrix& operator=( matrix const & rhs ) = default;
 	matrix& operator=( matrix&& rhs ) noexcept = default;
 
-	value_type*
+    iterator< T >
 	operator[]( const index_type row )
 	{
-		auto offset = row * columns;
-
-		return &this->container[offset];
+		return iterator< T >( std::addressof( this->container[0] ), std::slice( row * this->rows, this->rows, 1 ) );
 	}
 
-	value_type const *
+    iterator< T >
 	operator[]( const index_type row ) const
 	{
-		auto offset = row * columns;
-
-		return &this->container[offset];
+        return iterator< T >( std::addressof( this->container[0] ), std::slice(row * this->rows, this->rows, 1));
 	}
 
 	index_type

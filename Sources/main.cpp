@@ -10,7 +10,7 @@
 #include <chrono>
 #include <iostream>
 
-int main()
+namespace mandelbrot_constants
 {
 	const std::string filename = "output_image";
 	const std::size_t rows = 1024;
@@ -20,18 +20,21 @@ int main()
 	const auto max_real = 0.7;
 	const auto min_complex = -1.0;
 	const auto max_complex = 1.0;
+}
 
+int main()
+{
 	const auto start = std::chrono::system_clock::now();
 
 	auto mandelbrot_color_image =
 		fractals::mandelbrot::compute_color_buffer(
-			rows,
-			columns,
-			max_iterations,
-			min_real,
-			max_real,
-			min_complex,
-			max_complex );
+		    mandelbrot_constants::rows,
+		    mandelbrot_constants::columns,
+		    mandelbrot_constants::max_iterations,
+		    mandelbrot_constants::min_real,
+		    mandelbrot_constants::max_real,
+		    mandelbrot_constants::min_complex,
+		    mandelbrot_constants::max_complex );
 
 	const auto end_calculation = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_calc = end_calculation - start;
@@ -39,7 +42,7 @@ int main()
 	std::cout << "Calculation: " << elapsed_seconds_calc.count() << "s" << std::endl;
 
 	netpbm::write(
-		filename,
+		mandelbrot_constants::filename,
 		netpbm::encoding::ascii,
 		mandelbrot_color_image );
 
