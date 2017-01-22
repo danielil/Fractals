@@ -40,7 +40,7 @@ public:
 		return &this->container[offset];
 	}
 
-	value_type const * const
+	value_type const *
 	operator[]( const index_type row ) const
 	{
 		auto offset = row * columns;

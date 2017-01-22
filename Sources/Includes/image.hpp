@@ -19,7 +19,6 @@ struct rgb_channels
 	channel_type green = 0;
 	channel_type blue = 0;
 };
-
 using rgb_image = matrix< rgb_channels >;
 
 static constexpr auto MAX_CHANNEL_VALUE = std::numeric_limits< channel_type >::max();

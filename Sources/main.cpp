@@ -13,26 +13,26 @@
 int main()
 {
 	const std::string filename = "output_image";
-	const std::size_t rows = 1024;
-	const std::size_t columns = 1024;
-	const auto max_iterations = MAX_CHANNEL_VALUE;
-	const double min_real = -1.5;
-	const double max_real = 0.7;
-	const double min_complex = -1.0;
-	const double max_complex = 1.0;
+	constexpr std::size_t rows = 1024;
+	constexpr std::size_t columns = 1024;
+	constexpr auto max_iterations = MAX_CHANNEL_VALUE;
+	constexpr auto min_real = -1.5;
+	constexpr auto max_real = 0.7;
+	constexpr auto min_complex = -1.0;
+	constexpr auto max_complex = 1.0;
 
 	const auto start = std::chrono::system_clock::now();
 
 	auto mandelbrot_color_image =
-		fractals::mandelbrot::retrieve_color_image(
-			fractals::mandelbrot::compute_buffer(
-				rows,
-				columns,
-				max_iterations,
-				min_real,
-				max_real,
-				min_complex,
-				max_complex ) );
+		fractals::mandelbrot::compute_buffer(
+			rows,
+			columns,
+			max_iterations,
+			min_real,
+			max_real,
+			min_complex,
+			max_complex,
+			fractals::mandelbrot::compute_color_map );
 
 	const auto end_calculation = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_calc = end_calculation - start;

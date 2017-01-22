@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <complex>
 #include <numeric>
+#include <type_traits>
 
 namespace fractals {
 namespace mandelbrot
@@ -19,8 +20,9 @@ namespace mandelbrot
 	using iteration_type = decltype( MAX_CHANNEL_VALUE );
 	using value_type = std::remove_const< iteration_type >::type;
 
-	using container_type = matrix< value_type >;
-	using index_type = container_type::index_type;
+	template < typename T = value_type >
+	using container_type = matrix< T >;
+	using index_type = container_type<>::index_type;
 
 	value_type
 	compute_iteration(
@@ -99,7 +101,8 @@ namespace mandelbrot
 				max_iterations );
 	}
 
-	container_type
+	template < typename ValueMappingFunction >
+	auto
 	compute_buffer(
 		const index_type rows,
 		const index_type columns,
@@ -107,32 +110,37 @@ namespace mandelbrot
 		const real_type min_real,
 		const real_type max_real,
 		const real_type min_imaginary,
-		const real_type max_imaginary )
+		const real_type max_imaginary,
+		ValueMappingFunction mapper )
 	{
-		container_type set( rows, columns );
+		using element_type = std::result_of< ValueMappingFunction( const value_type value ) >::type;
+
+		container_type< element_type > set( rows, columns );
 
 		for ( std::size_t row = 0; row < set.get_rows(); ++row )
 		{
 			for ( std::size_t column = 0; column < set.get_columns(); ++column )
 			{
 				set[row][column] =
-					compute_value(
-						row,
-						rows,
-						column,
-						columns,
-						max_iterations,
-						min_real,
-						max_real,
-						min_imaginary,
-						max_imaginary );
+					mapper(
+						compute_value(
+							row,
+							rows,
+							column,
+							columns,
+							max_iterations,
+							min_real,
+							max_real,
+							min_imaginary,
+							max_imaginary ));
 			}
 		}
 
 		return set;
 	}
 
-	rgb_channels compute_color_map( const value_type value )
+	rgb_channels
+	compute_color_map( const value_type value )
 	{
 		return
 		{
@@ -140,22 +148,5 @@ namespace mandelbrot
 			static_cast< channel_type >( value * value ), // Green
 			static_cast< channel_type >( value * std::abs( std::sin( value ) ) ) // Blue
 		};
-	}
-
-	template < typename Set >
-	auto
-	retrieve_color_image( Set&& set )
-	{
-		rgb_image image( set.get_rows(), set.get_columns() );
-
-		for ( std::size_t row = 0; row < image.get_rows(); ++row )
-		{
-			for ( std::size_t column = 0; column < image.get_columns(); ++column )
-			{
-				image[row][column] = compute_color_map( set[row][column] );
-			}
-		}
-
-		return image;
 	}
 }}
