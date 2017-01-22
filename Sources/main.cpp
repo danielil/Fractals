@@ -4,6 +4,7 @@
  */
 
 #include "mandelbrot_generator.hpp"
+#include "value_mapping.hpp"
 
 #include "netpbm_writer.hpp"
 
@@ -23,7 +24,7 @@ int main()
 
 	const auto start = std::chrono::system_clock::now();
 
-	auto mandelbrot_color_image =
+	auto mandelbrot_image =
 		fractals::mandelbrot::compute_buffer(
 			rows,
 			columns,
@@ -32,7 +33,7 @@ int main()
 			max_real,
 			min_complex,
 			max_complex,
-			fractals::mandelbrot::compute_color_map );
+			fractals::map_color< fractals::mandelbrot::value_type > );
 
 	const auto end_calculation = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_calc = end_calculation - start;
@@ -42,7 +43,7 @@ int main()
 	netpbm::write(
 		filename,
 		netpbm::encoding::ascii,
-		mandelbrot_color_image );
+		mandelbrot_image );
 
 	const auto end_write = std::chrono::system_clock::now();
 	const std::chrono::duration< double > elapsed_seconds_write = end_write - end_calculation;

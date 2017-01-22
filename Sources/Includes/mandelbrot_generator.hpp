@@ -16,13 +16,9 @@ namespace fractals {
 namespace mandelbrot
 {
 	using real_type = double;
-
 	using iteration_type = decltype( MAX_CHANNEL_VALUE );
 	using value_type = std::remove_const< iteration_type >::type;
-
-	template < typename T = value_type >
-	using container_type = matrix< T >;
-	using index_type = container_type<>::index_type;
+	using index_type = image_container< value_type >::size_type;
 
 	value_type
 	compute_iteration(
@@ -111,22 +107,22 @@ namespace mandelbrot
 		const real_type max_real,
 		const real_type min_imaginary,
 		const real_type max_imaginary,
-		ValueMappingFunction mapper )
+		ValueMappingFunction map_value )
 	{
 		using element_type = std::result_of< ValueMappingFunction( const value_type value ) >::type;
 
-		container_type< element_type > set( rows, columns );
+		image_container< element_type > set( rows, columns );
 
-		for ( std::size_t row = 0; row < set.get_rows(); ++row )
+		for ( auto row = set.begin1(); row != set.end1(); ++row )
 		{
-			for ( std::size_t column = 0; column < set.get_columns(); ++column )
+			for ( auto column = row.begin(); column != row.end(); ++column )
 			{
-				set[row][column] =
-					mapper(
+				*column =
+					map_value(
 						compute_value(
-							row,
+							column.index1(),
 							rows,
-							column,
+							column.index2(),
 							columns,
 							max_iterations,
 							min_real,
@@ -137,16 +133,5 @@ namespace mandelbrot
 		}
 
 		return set;
-	}
-
-	rgb_channels
-	compute_color_map( const value_type value )
-	{
-		return
-		{
-			static_cast< channel_type >( value ), // Red
-			static_cast< channel_type >( value * value ), // Green
-			static_cast< channel_type >( value * std::abs( std::sin( value ) ) ) // Blue
-		};
 	}
 }}

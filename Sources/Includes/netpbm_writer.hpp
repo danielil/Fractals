@@ -91,56 +91,6 @@ namespace netpbm
 	write(
 		const std::string filename,
 		const encoding encoding,
-		binary_image const & buffer )
-	{
-		auto writer =
-			get_stream_writer(
-				filename,
-				format::pbm,
-				encoding,
-				buffer.get_rows(),
-				buffer.get_columns() );
-
-		for ( binary_image::index_type row = 0; row < buffer.get_rows(); ++row )
-		{
-			for ( binary_image::index_type column = 0; column < buffer.get_columns(); ++column )
-			{
-				writer << static_cast< unsigned int >( buffer[row][column] ) << " ";
-			}
-
-			writer << std::endl;
-		}
-	}
-
-	void
-	write(
-		const std::string filename,
-		const encoding encoding,
-		monochrome_image const & image )
-	{
-		auto writer =
-			get_stream_writer(
-				filename,
-				format::pgm,
-				encoding,
-				image.get_rows(),
-				image.get_columns() );
-
-		for ( monochrome_image::index_type row = 0; row < image.get_rows(); ++row )
-		{
-			for ( monochrome_image::index_type column = 0; column < image.get_columns(); ++column )
-			{
-				writer << static_cast< unsigned int >( image[row][column] ) << " ";
-			}
-
-			writer << std::endl;
-		}
-	}
-
-	void
-	write(
-		const std::string filename,
-		const encoding encoding,
 		rgb_image const & image )
 	{
 		auto writer =
@@ -148,14 +98,14 @@ namespace netpbm
 				filename,
 				format::ppm,
 				encoding,
-				image.get_rows(),
-				image.get_columns() );
+				image.size1(),
+				image.size2() );
 
-		for ( rgb_image::index_type row = 0; row < image.get_rows(); ++row )
+		for ( auto row = image.begin1(); row != image.end1(); ++row )
 		{
-			for ( rgb_image::index_type column = 0; column < image.get_columns(); ++column )
+			for ( auto column = row.begin(); column != row.end(); ++column )
 			{
-				const auto color = image[row][column];
+				const auto color = *column;
 
 				writer << static_cast< unsigned int >( color.red ) << " ";
 				writer << static_cast< unsigned int >( color.green ) << " ";

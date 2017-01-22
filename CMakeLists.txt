@@ -19,6 +19,13 @@ target_include_directories(
 	PRIVATE
 		${SOURCE_HEADERS} )
 
+# Include the external headers
+set( EXTERNAL_HEADERS External )
+target_include_directories(
+	${EXECUTABLE_NAME}
+	PRIVATE
+		${EXTERNAL_HEADERS} )
+
 # Enforce C++14 standard and output settings
 set_target_properties(
 	${EXECUTABLE_NAME}

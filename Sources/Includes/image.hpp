@@ -5,14 +5,15 @@
 
 #pragma once
 
-#include "matrix.hpp"
+#include <boost/numeric/ublas/matrix.hpp>
 
-#include <numeric>
+template< typename T >
+using image_container = boost::numeric::ublas::matrix< T >;
 
-using binary_image = matrix< bool >;
+using binary_image = image_container< bool >;
 
 using channel_type = std::uint8_t;
-using monochrome_image = matrix< channel_type >;
+using monochrome_image = image_container< channel_type >;
 
 struct rgb_channels
 {
@@ -20,6 +21,6 @@ struct rgb_channels
 	channel_type green = 0;
 	channel_type blue = 0;
 };
-using rgb_image = matrix< rgb_channels >;
+using rgb_image = image_container< rgb_channels >;
 
 static constexpr auto MAX_CHANNEL_VALUE = std::numeric_limits< channel_type >::max();
