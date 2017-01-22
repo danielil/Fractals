@@ -7,10 +7,11 @@
 
 #include "matrix.hpp"
 
-using channel_type = std::uint8_t;
-using rgb_type = std::uint32_t;
+#include <numeric>
 
 using binary_image = matrix< bool >;
+
+using channel_type = std::uint8_t;
 using monochrome_image = matrix< channel_type >;
 
 struct rgb_channels
