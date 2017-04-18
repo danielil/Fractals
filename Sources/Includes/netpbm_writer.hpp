@@ -91,21 +91,21 @@ namespace netpbm
 	write(
 		const std::string filename,
 		const encoding encoding,
-		rgb_image const & image )
+		const rgb_image& image )
 	{
 		auto writer =
 			get_stream_writer(
 				filename,
 				format::ppm,
 				encoding,
-				image.size1(),
-				image.size2() );
+				image.size(),
+				image.front().size() );
 
-		for ( auto row = image.begin1(); row != image.end1(); ++row )
+		for ( const auto& row : image )
 		{
-			for ( auto column = row.begin(); column != row.end(); ++column )
+			for ( const auto& column : row )
 			{
-				const auto color = *column;
+				const auto color = column;
 
 				writer << static_cast< unsigned int >( color.red ) << " ";
 				writer << static_cast< unsigned int >( color.green ) << " ";

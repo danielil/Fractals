@@ -1,7 +1,7 @@
 # Daniel Sebastian Iliescu, http://dansil.net
 # MIT License (MIT), http://opensource.org/licenses/MIT
 
-cmake_minimum_required( VERSION 3.5.2 )
+cmake_minimum_required( VERSION 3.8.0 )
 
 project( Fractals CXX )
 
@@ -26,11 +26,11 @@ target_include_directories(
 	PRIVATE
 		${EXTERNAL_HEADERS} )
 
-# Enforce C++14 standard and output settings
+# Enforce C++17 standard and output settings
 set_target_properties(
 	${EXECUTABLE_NAME}
 	PROPERTIES
-		CMAKE_CXX_STANDARD 14
+		CMAKE_CXX_STANDARD 17
 		CMAKE_CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS OFF
 		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib

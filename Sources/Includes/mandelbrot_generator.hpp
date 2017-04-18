@@ -111,18 +111,25 @@ namespace mandelbrot
 	{
 		using element_type = std::result_of< ValueMappingFunction( const value_type value ) >::type;
 
-		image_container< element_type > set( rows, columns );
+		image_container< element_type > set( rows, std::vector< element_type >( columns ) );
 
-		for ( auto row = set.begin1(); row != set.end1(); ++row )
+		std::size_t row_count = 0;
+
+		for ( auto& row : set )
 		{
-			for ( auto column = row.begin(); column != row.end(); ++column )
+			std::size_t column_count = 0;
+			++row_count;
+
+			for ( auto& column : row  )
 			{
-				*column =
+				++column_count;
+
+				column =
 					map_value(
 						compute_value(
-							column.index1(),
+							row_count,
 							rows,
-							column.index2(),
+							column_count,
 							columns,
 							max_iterations,
 							min_real,

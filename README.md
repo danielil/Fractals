@@ -1,6 +1,3 @@
-<!--
-[![Build Status](https://travis-ci.org/danielil/Fractals.svg?branch=master)](https://travis-ci.org/danielil/Fractals) [![Build status](https://ci.appveyor.com/api/projects/status/52l4k6pp40sju7a9?svg=true)](https://ci.appveyor.com/project/danielil/fractals)
--->
 Fractals
 ================
 
@@ -19,7 +16,7 @@ License: `MIT License (MIT), http://opensource.org/licenses/MIT`
 Requirements
 ------------------
 
-C++14 conforming compiler.
+C++17 conforming compiler.
 
 Limitations
 ------------------

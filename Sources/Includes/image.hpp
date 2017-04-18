@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include <boost/numeric/ublas/matrix.hpp>
+#include <vector>
 
 template< typename T >
-using image_container = boost::numeric::ublas::matrix< T >;
+using image_container = std::vector < std::vector< T > >;
 
 using binary_image = image_container< bool >;
 
