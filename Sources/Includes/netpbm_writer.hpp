@@ -88,7 +88,7 @@ namespace netpbm
 	}
 
 	void
-	write(
+	write_color(
 		const std::string filename,
 		const encoding encoding,
 		const rgb_image& image )

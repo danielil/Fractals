@@ -40,7 +40,7 @@ int main()
 
 	std::cout << "Calculation: " << elapsed_seconds_calc.count() << "s" << std::endl;
 
-	netpbm::write(
+	netpbm::write_color(
 		filename,
 		netpbm::encoding::ascii,
 		mandelbrot_image );
